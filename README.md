@@ -50,11 +50,11 @@ gantt
     Resolución dudas Córcega      :done, v0e, 2025-02-18, 1d
     Definir mínimos y máximos     :done, v0f, 2025-02-19, 1d
     Diagramas                     :done, v0g, 2025-02-10, 10d
-    Redactar documentación        :active, v0h, 2025-02-10, 10d
+    Redactar documentación        :done, v0h, 2025-02-10, 10d
 
     section V1 (Desarrollo Mínimos)
-    Videollamada seguimiento Córcega    : v1a, 2025-02-21, 1d
-    Desarrollo backend mínimos          : v1b, after v1a, 20d
+    Videollamada seguimiento Córcega    :done,  v1a, 2025-02-21, 1d
+    Desarrollo backend mínimos          :active, v1b, after v1a, 20d
     Desarrollo frontend mínimos         : v1c, after v1b, 2025-04-05
 
     section Pruebas V1
