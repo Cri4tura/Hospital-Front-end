@@ -68,8 +68,8 @@ gantt
     V1 Documentación                    : des6, after des1, 2025-04-30
 
     section V2 (Desarrollo Máximos)
-    Ampliación backend máximos          : v2a, after des6, 10d
-    Ampliación frontend máximos         : v2b, after des6, 10d
+    Ampliación backend máximos          : v2a, 2025-04-30, 10d
+    Ampliación frontend máximos         : v2b, 2025-04-30, 10d
 
     section Pruebas V2
     Pruebas unitarias                   : des7, after v2b, 2d
