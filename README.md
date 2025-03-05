@@ -54,7 +54,7 @@ gantt
 
     section V1 (Desarrollo Mínimos)
     Videollamada seguimiento Córcega    :done,  v1a, 2025-02-21, 1d
-    Desarrollo backend mínimos          :active, v1b, after v1a, 20d
+    Desarrollo backend mínimos          :active, v1b, after v1a, 2025-04-05
     Desarrollo frontend mínimos         :active, v1c, after v1a, 2025-04-05
 
     section Pruebas V1
@@ -68,8 +68,8 @@ gantt
     V1 Documentación                    : des6, after des1, 2025-04-30
 
     section V2 (Desarrollo Máximos)
-    Ampliación backend máximos          : v2a, 2025-05-01, 10d
-    Ampliación frontend máximos         : v2b, after v2a, 10d
+    Ampliación backend máximos          : v2a, after des6, 10d
+    Ampliación frontend máximos         : v2b, after des6, 10d
 
     section Pruebas V2
     Pruebas unitarias                   : des7, after v2b, 2d
