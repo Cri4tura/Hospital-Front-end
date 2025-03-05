@@ -55,7 +55,7 @@ gantt
     section V1 (Desarrollo Mínimos)
     Videollamada seguimiento Córcega    :done,  v1a, 2025-02-21, 1d
     Desarrollo backend mínimos          :active, v1b, after v1a, 20d
-    Desarrollo frontend mínimos         : v1c, after v1b, 2025-04-05
+    Desarrollo frontend mínimos         :active, v1c, after v1a, 2025-04-05
 
     section Pruebas V1
     Pruebas unitarias                   : des1, after v1c, 3d
