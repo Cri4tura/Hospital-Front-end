@@ -63,6 +63,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.materialIcon
+import androidx.compose.material.icons.outlined.Person
 import com.example.panacea.domain.models.room.Room
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -137,22 +138,17 @@ fun RoomCard(room: Room) {
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            Text(
-                text = "ROOM",
-                style = MaterialTheme.typography.labelLarge,
-                color = contentColor.copy(alpha = 0.7f)
-            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = room.name ?: "",
+                text = ("ROOM " + room.name) ?: "",
                 style = MaterialTheme.typography.headlineSmall,
                 color = contentColor
             )
 
             Text(
-                text = room.section,
+                text = ("Section " + room.section),
                 style = MaterialTheme.typography.bodyMedium,
                 color = contentColor.copy(alpha = 0.8f)
             )
@@ -164,7 +160,7 @@ fun RoomCard(room: Room) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        Icons.Outlined.Email,
+                        Icons.Outlined.Person,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = contentColor.copy(alpha = 0.6f)
