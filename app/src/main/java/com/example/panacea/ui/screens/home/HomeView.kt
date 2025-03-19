@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -57,6 +60,10 @@ import com.example.panacea.data.utils.Constants.MENU
 import com.example.panacea.ui.navigation.SPLASH
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.materialIcon
+import com.example.panacea.domain.models.room.Room
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -64,7 +71,6 @@ fun HomeView(
     nav: NavHostController,
     vm: HomeViewModel
 ) {
-
     DrawerAppBar(
         nav = nav,
         index = MENU.OPTION_2,
@@ -72,17 +78,9 @@ fun HomeView(
         pageTitle = {
             Image(
                 painter = painterResource(id = R.drawable.panacea),
-                contentDescription = "Glide image ",
+                contentDescription = "Logo Panacea",
                 modifier = Modifier.height(40.dp)
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { },
-                containerColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
         },
         userImage = "${vm.data.currentUser?.profileImage}",
         screenContent = {
@@ -90,107 +88,12 @@ fun HomeView(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
-
                 when {
                     vm.state.isLoading -> {
                         CircularProgressIndicator()
                     }
                     vm.state.onSuccess -> {
-                        Log.e("HomeView", "Datos cargados exitosamente")
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            items(vm.data.nurseList) { nurse ->
-
-                                var isFavorite by remember { mutableStateOf(false) }
-
-                                Card(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                    elevation = CardDefaults.cardElevation(4.dp),
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-
-                                            Box(
-                                                contentAlignment = Alignment.Center,
-                                                modifier = Modifier
-                                                    .size(80.dp)
-                                                    .clip(CircleShape)
-                                                    .background(
-                                                        lerp(
-                                                            MaterialTheme.colorScheme.onPrimary,
-                                                            MaterialTheme.colorScheme.primary,
-                                                            0.35f
-                                                        )
-                                                    )
-                                                //.border(3.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                                            ) {
-
-                                                val resourceId = LocalContext.current.resources.getIdentifier(
-                                                    nurse.profileImage,
-                                                    "drawable",
-                                                    LocalContext.current.packageName
-                                                )
-
-                                                if (resourceId != 0) {
-                                                    Image(
-                                                        painter = painterResource(id = resourceId),
-                                                        contentDescription = null,
-                                                    )
-                                                } else {
-                                                    Image(
-                                                        painter = painterResource(id = R.drawable.nurse_register),
-                                                        contentDescription = null
-                                                    )
-                                                }
-                                            }
-                                            Icon(
-                                                modifier = Modifier
-                                                    .padding(4.dp)
-                                                    .size(25.dp)
-                                                    .clip(CircleShape)
-                                                    .clickable { isFavorite = !isFavorite },
-                                                imageVector = if (isFavorite) Icons.Outlined.Favorite else Icons.Filled.FavoriteBorder,
-                                                contentDescription = null,
-                                                tint = lerp(Color.Red, Color.Black, 0.2f)
-                                            )
-
-                                        }
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        Text(
-                                            text = "${nurse.name} ${nurse.surname}",
-                                            style = MaterialTheme.typography.titleLarge
-                                        )
-                                        Text(
-                                            text = nurse.email,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        Text(
-                                            text = "Material is a design system – backed by open source code – that helps teams build high-quality digital experiences.",
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-                                    }
-                                }
-                            }
-                        }
+                        RoomsGrid(vm.data.roomList)
                     }
                 }
             }
@@ -198,3 +101,94 @@ fun HomeView(
     )
 }
 
+@Composable
+fun RoomsGrid(roomList: List<Room>) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(roomList) { room ->
+            RoomCard(room)
+        }
+    }
+}
+
+@Composable
+fun RoomCard(room: Room) {
+    val isAvailable = room.patient == null
+    val backgroundColor = if (isAvailable) Color(0xFF4CAF50) else MaterialTheme.colorScheme.surface
+    val contentColor = if (isAvailable) Color.White else MaterialTheme.colorScheme.onSurface
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "ROOM",
+                style = MaterialTheme.typography.labelLarge,
+                color = contentColor.copy(alpha = 0.7f)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = room.name ?: "",
+                style = MaterialTheme.typography.headlineSmall,
+                color = contentColor
+            )
+
+            Text(
+                text = room.section,
+                style = MaterialTheme.typography.bodyMedium,
+                color = contentColor.copy(alpha = 0.8f)
+            )
+
+            if (!isAvailable) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Outlined.Email,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = contentColor.copy(alpha = 0.6f)
+                    )
+
+                    Spacer(modifier = Modifier.size(4.dp))
+
+                    room.patient?.let {
+                        Text(
+                            text = it.name,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Available",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = contentColor.copy(alpha = 0.9f)
+                )
+            }
+        }
+    }
+}

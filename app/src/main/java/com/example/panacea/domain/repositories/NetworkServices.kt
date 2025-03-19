@@ -1,6 +1,7 @@
 package com.example.panacea.domain.repositories
 
 import com.example.panacea.domain.models.nurse.Nurse
+import com.example.panacea.domain.models.room.Room
 import java.util.Date
 
 interface NetworkServices {
@@ -10,4 +11,5 @@ interface NetworkServices {
     suspend fun deleteNurse(userId: Int): Boolean
     suspend fun updateNurse(updatedData: Nurse): Nurse
     suspend fun register(nurse: Nurse): Nurse
+    suspend fun getRooms(): List<Room>
 }

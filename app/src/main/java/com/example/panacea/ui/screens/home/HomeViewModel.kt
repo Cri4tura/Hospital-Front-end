@@ -7,14 +7,17 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.panacea.data.repositories.NurseRepositoryImpl
+import com.example.panacea.data.repositories.RoomRepositoryImpl
 import kotlinx.coroutines.launch
 import com.example.panacea.domain.models.nurse.Nurse
+import com.example.panacea.domain.models.room.Room
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
 class HomeViewModel(
-    private val repository: NurseRepositoryImpl
+    private val nurseRepository: NurseRepositoryImpl,
+    private val roomRepository: RoomRepositoryImpl
 ) : ViewModel() {
 
     var state by mutableStateOf(UiState())
@@ -27,8 +30,8 @@ class HomeViewModel(
         viewModelScope.launch {
             state = UiState(isLoading = true)
             data = UiData(
-                nurseList = repository.getCachedNurseList(),
-                currentUser = repository.getCurrentUser()
+                roomList = roomRepository.getCachedRoomList(),
+                currentUser = nurseRepository.getCurrentUser()
             )
             state = UiState(isLoading = false, onSuccess = true)
         }
@@ -41,7 +44,7 @@ class HomeViewModel(
     )
 
     data class UiData(
-        val nurseList: List<Nurse> = emptyList(),
+        val roomList: List<Room> = emptyList(),
         val currentUser: Nurse? = null
     )
 

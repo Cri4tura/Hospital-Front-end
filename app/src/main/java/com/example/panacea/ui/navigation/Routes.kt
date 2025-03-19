@@ -32,3 +32,6 @@ object NEWS
 @Serializable
 object HISTORY
 
+@Serializable
+object ROOM
+

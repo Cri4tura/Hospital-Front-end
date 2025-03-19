@@ -6,12 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.panacea.data.repositories.NurseRepositoryImpl
+import com.example.panacea.data.repositories.RoomRepositoryImpl
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class SplashViewModel(
-    private val repository: NurseRepositoryImpl
+    private val nurseRepository: NurseRepositoryImpl,
+    private val roomRepository: RoomRepositoryImpl
+
 ) : ViewModel() {
 
     var state by mutableStateOf(UiState())
@@ -28,7 +31,8 @@ class SplashViewModel(
             state = UiState(isLoading = true)
             try {
                 //repository.ping()
-                repository.fetchNurseList()
+                nurseRepository.fetchNurseList()
+                roomRepository.fetchRoomList()
                 state = UiState(isLoading = false, onSuccess = true)
             } catch (e: Exception) {
                 state = UiState(isLoading = false, onError = true)

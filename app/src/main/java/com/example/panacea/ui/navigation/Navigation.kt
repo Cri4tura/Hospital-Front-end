@@ -18,6 +18,7 @@ import com.example.panacea.ui.screens.history.HistoryView
 import com.example.panacea.ui.screens.news.NewsView
 import com.example.panacea.ui.screens.profile.ProfileView
 import com.example.panacea.ui.screens.profile.ProfileViewModel
+import com.example.panacea.ui.screens.room.RoomView
 import com.example.panacea.ui.screens.signIn.SignInView
 import com.example.panacea.ui.screens.splash.SplashView
 import com.example.panacea.ui.screens.signIn.SignInViewModel
@@ -31,12 +32,12 @@ fun Navigation(
 
     NavHost(navController = nav, startDestination = SPLASH) {
         composable<SPLASH> {
-            SplashView(nav = nav, SplashViewModel(koinInject(), /*koinInject(), koinInject()*/))
+            SplashView(nav = nav, SplashViewModel(koinInject(), koinInject(),/* koinInject()*/))
         }
         composable<HOME> {
             HomeView(
                 nav = nav,
-                vm = HomeViewModel(koinInject())
+                vm = HomeViewModel(koinInject(), koinInject())
             )
         }
         composable<LOGIN> {
@@ -87,6 +88,9 @@ fun Navigation(
         }
         composable<HISTORY> {
             HistoryView(nav = nav)
+        }
+        composable<ROOM> {
+            RoomView(nav = nav)
         }
     }
 }
