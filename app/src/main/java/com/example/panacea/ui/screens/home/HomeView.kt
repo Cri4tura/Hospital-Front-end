@@ -62,8 +62,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import com.example.panacea.domain.models.room.Room
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -103,16 +106,165 @@ fun HomeView(
 }
 
 @Composable
-fun RoomsGrid(roomList: List<Room>) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+fun FilterChipExample() {
+    var selectedAll by remember { mutableStateOf(true) }
+    var selectedAvailable by remember { mutableStateOf(false) }
+    var selectedOccupied by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(roomList) { room ->
-            RoomCard(room)
+        FilterChip(
+            onClick = {
+                selectedAll = true
+                selectedAvailable = false
+                selectedOccupied = false
+            },
+            label = {
+                Text("Todas")
+            },
+            selected = selectedAll,
+            leadingIcon = if (selectedAll) {
+                {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Done icon",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            } else {
+                null
+            },
+        )
+
+        FilterChip(
+            onClick = {
+                selectedAll = false
+                selectedAvailable = true
+                selectedOccupied = false
+            },
+            label = {
+                Text("Disponibles")
+            },
+            selected = selectedAvailable,
+            leadingIcon = if (selectedAvailable) {
+                {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Done icon",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            } else {
+                null
+            },
+        )
+
+        FilterChip(
+            onClick = {
+                selectedAll = false
+                selectedAvailable = false
+                selectedOccupied = true
+            },
+            label = {
+                Text("Ocupadas")
+            },
+            selected = selectedOccupied,
+            leadingIcon = if (selectedOccupied) {
+                {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Done icon",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            } else {
+                null
+            },
+        )
+    }
+}
+
+@Composable
+fun RoomsGrid(roomList: List<Room>) {
+    // Estado para almacenar el filtro seleccionado
+    var filterState by remember { mutableStateOf("all") } // Valores posibles: "all", "available", "occupied"
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Filtros en la parte superior
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                onClick = { filterState = "all" },
+                label = { Text("Todas") },
+                selected = filterState == "all",
+                leadingIcon = if (filterState == "all") {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Todas seleccionadas",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                } else null
+            )
+
+            FilterChip(
+                onClick = { filterState = "available" },
+                label = { Text("Disponibles") },
+                selected = filterState == "available",
+                leadingIcon = if (filterState == "available") {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Disponibles seleccionadas",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                } else null
+            )
+
+            FilterChip(
+                onClick = { filterState = "occupied" },
+                label = { Text("Ocupadas") },
+                selected = filterState == "occupied",
+                leadingIcon = if (filterState == "occupied") {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Ocupadas seleccionadas",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                } else null
+            )
+        }
+
+        // Filtrar las habitaciones según el filtro seleccionado
+        val filteredRooms = when (filterState) {
+            "available" -> roomList.filter { it.patient == null }
+            "occupied" -> roomList.filter { it.patient != null }
+            else -> roomList // "all" o valor por defecto
+        }
+
+        // Grid con las habitaciones filtradas
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(filteredRooms) { room ->
+                RoomCard(room)
+            }
         }
     }
 }
