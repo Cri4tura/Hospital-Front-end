@@ -7,6 +7,7 @@ import com.example.panacea.data.network.ConnectionException
 import com.example.panacea.data.network.ErrorType
 import com.example.panacea.data.network.NetworkServicesImpl
 import com.example.panacea.data.repositories.NurseRepositoryImpl
+import com.example.panacea.data.repositories.RoomRepositoryImpl
 import com.example.panacea.ui.screens.directory.DirectoryViewModel
 import com.example.panacea.ui.screens.home.HomeViewModel
 import com.example.panacea.ui.screens.login.LoginViewModel
@@ -61,7 +62,7 @@ val appModule = module {
             install(DefaultRequest) {
                 url {
                     protocol = URLProtocol.HTTP
-                    host = "10.118.3.210"
+                    host = "192.168.145.1"
                     port = 8080
                 }
             }
@@ -170,13 +171,14 @@ val appModule = module {
 
     // Repositorios
     single { NurseRepositoryImpl(get()) } // Repositorio singleton
+    single { RoomRepositoryImpl(get()) } // Repositorio singleton
 
     // Proveer el ViewModel e inyectar el repositorio
-    viewModel { SplashViewModel(get() /*, get(), get()*/) }
+    viewModel { SplashViewModel(get() , get(), /* get()*/) }
     viewModel { SignInViewModel(get()) }
     viewModel { ProfileViewModel(get()) }
     viewModel { DirectoryViewModel(get()) }
-    viewModel { HomeViewModel(get()) }
+    viewModel { HomeViewModel(get(),get()) }
     viewModel { LoginViewModel(get()) }
 }
 

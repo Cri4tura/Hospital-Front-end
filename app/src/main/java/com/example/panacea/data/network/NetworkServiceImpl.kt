@@ -1,15 +1,13 @@
 package com.example.panacea.data.network
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import com.example.panacea.domain.models.nurse.Nurse
 import com.example.panacea.domain.models.nurse.NurseResponse
+import com.example.panacea.domain.models.room.Room
+import com.example.panacea.domain.models.room.RoomResponse
 import com.example.panacea.domain.repositories.NetworkServices
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.network.sockets.ConnectTimeoutException
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.plugin
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -17,8 +15,6 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
-import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -32,6 +28,36 @@ class NetworkServicesImpl(
     private val client: HttpClient,
     private val json: Json
 ) : NetworkServices {
+
+    override suspend fun getRooms(): List<Room> {
+        val allRooms = mutableListOf<Room>()
+        try {
+            val response: HttpResponse = client.get("/room")
+
+            if (response.status == HttpStatusCode.OK) {
+                val responseBody: String = response.bodyAsText()
+                val jsonResponse: JsonObject = json.decodeFromString(responseBody)
+                val prettyJson = json.encodeToString(jsonResponse)
+                Log.d("NETWORK", prettyJson)
+
+                val roomResponse: RoomResponse = json.decodeFromString(responseBody)
+                roomResponse.data.forEach { room ->
+                    allRooms.add(room)
+                }
+            } else {
+                if (response.status == HttpStatusCode.NoContent) {
+                    Log.e("NETWORK", "HttpStatus NO CONTENT: ${response.status.value}")
+                    throw Exception("HttpStatus NO CONTENT: ${response.status.value}")
+                }
+                Log.e("NETWORK", "STATUS CODE: ${response.status.value}")
+                throw Exception("STATUS CODE: ${response.status.value}")
+            }
+        } catch (e: Exception) {
+            Log.e("NETWORK", "Error al obtener habitaciones: ${e.localizedMessage}")
+            throw e
+        }
+        return allRooms
+    }
 
     override suspend fun getNurses(): List<Nurse> {
         val allNurses = mutableListOf<Nurse>()
@@ -233,4 +259,6 @@ class NetworkServicesImpl(
             return newNurse
         }
     }
+
+
 }

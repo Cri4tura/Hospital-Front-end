@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -57,6 +60,14 @@ import com.example.panacea.data.utils.Constants.MENU
 import com.example.panacea.ui.navigation.SPLASH
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.materialIcon
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import com.example.panacea.domain.models.room.Room
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -64,7 +75,6 @@ fun HomeView(
     nav: NavHostController,
     vm: HomeViewModel
 ) {
-
     DrawerAppBar(
         nav = nav,
         index = MENU.OPTION_2,
@@ -72,17 +82,9 @@ fun HomeView(
         pageTitle = {
             Image(
                 painter = painterResource(id = R.drawable.panacea),
-                contentDescription = "Glide image ",
+                contentDescription = "Logo Panacea",
                 modifier = Modifier.height(40.dp)
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { },
-                containerColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
         },
         userImage = "${vm.data.currentUser?.profileImage}",
         screenContent = {
@@ -90,107 +92,12 @@ fun HomeView(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
-
                 when {
                     vm.state.isLoading -> {
                         CircularProgressIndicator()
                     }
                     vm.state.onSuccess -> {
-                        Log.e("HomeView", "Datos cargados exitosamente")
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            items(vm.data.nurseList) { nurse ->
-
-                                var isFavorite by remember { mutableStateOf(false) }
-
-                                Card(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                    elevation = CardDefaults.cardElevation(4.dp),
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-
-                                            Box(
-                                                contentAlignment = Alignment.Center,
-                                                modifier = Modifier
-                                                    .size(80.dp)
-                                                    .clip(CircleShape)
-                                                    .background(
-                                                        lerp(
-                                                            MaterialTheme.colorScheme.onPrimary,
-                                                            MaterialTheme.colorScheme.primary,
-                                                            0.35f
-                                                        )
-                                                    )
-                                                //.border(3.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                                            ) {
-
-                                                val resourceId = LocalContext.current.resources.getIdentifier(
-                                                    nurse.profileImage,
-                                                    "drawable",
-                                                    LocalContext.current.packageName
-                                                )
-
-                                                if (resourceId != 0) {
-                                                    Image(
-                                                        painter = painterResource(id = resourceId),
-                                                        contentDescription = null,
-                                                    )
-                                                } else {
-                                                    Image(
-                                                        painter = painterResource(id = R.drawable.nurse_register),
-                                                        contentDescription = null
-                                                    )
-                                                }
-                                            }
-                                            Icon(
-                                                modifier = Modifier
-                                                    .padding(4.dp)
-                                                    .size(25.dp)
-                                                    .clip(CircleShape)
-                                                    .clickable { isFavorite = !isFavorite },
-                                                imageVector = if (isFavorite) Icons.Outlined.Favorite else Icons.Filled.FavoriteBorder,
-                                                contentDescription = null,
-                                                tint = lerp(Color.Red, Color.Black, 0.2f)
-                                            )
-
-                                        }
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        Text(
-                                            text = "${nurse.name} ${nurse.surname}",
-                                            style = MaterialTheme.typography.titleLarge
-                                        )
-                                        Text(
-                                            text = nurse.email,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        Text(
-                                            text = "Material is a design system – backed by open source code – that helps teams build high-quality digital experiences.",
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-                                    }
-                                }
-                            }
-                        }
+                        RoomsGrid(vm.data.roomList)
                     }
                 }
             }
@@ -198,3 +105,238 @@ fun HomeView(
     )
 }
 
+@Composable
+fun FilterChipExample() {
+    var selectedAll by remember { mutableStateOf(true) }
+    var selectedAvailable by remember { mutableStateOf(false) }
+    var selectedOccupied by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FilterChip(
+            onClick = {
+                selectedAll = true
+                selectedAvailable = false
+                selectedOccupied = false
+            },
+            label = {
+                Text("Todas")
+            },
+            selected = selectedAll,
+            leadingIcon = if (selectedAll) {
+                {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Done icon",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            } else {
+                null
+            },
+        )
+
+        FilterChip(
+            onClick = {
+                selectedAll = false
+                selectedAvailable = true
+                selectedOccupied = false
+            },
+            label = {
+                Text("Disponibles")
+            },
+            selected = selectedAvailable,
+            leadingIcon = if (selectedAvailable) {
+                {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Done icon",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            } else {
+                null
+            },
+        )
+
+        FilterChip(
+            onClick = {
+                selectedAll = false
+                selectedAvailable = false
+                selectedOccupied = true
+            },
+            label = {
+                Text("Ocupadas")
+            },
+            selected = selectedOccupied,
+            leadingIcon = if (selectedOccupied) {
+                {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Done icon",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            } else {
+                null
+            },
+        )
+    }
+}
+
+@Composable
+fun RoomsGrid(roomList: List<Room>) {
+    // Estado para almacenar el filtro seleccionado
+    var filterState by remember { mutableStateOf("all") } // Valores posibles: "all", "available", "occupied"
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Filtros en la parte superior
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                onClick = { filterState = "all" },
+                label = { Text("Todas") },
+                selected = filterState == "all",
+                leadingIcon = if (filterState == "all") {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Todas seleccionadas",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                } else null
+            )
+
+            FilterChip(
+                onClick = { filterState = "available" },
+                label = { Text("Disponibles") },
+                selected = filterState == "available",
+                leadingIcon = if (filterState == "available") {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Disponibles seleccionadas",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                } else null
+            )
+
+            FilterChip(
+                onClick = { filterState = "occupied" },
+                label = { Text("Ocupadas") },
+                selected = filterState == "occupied",
+                leadingIcon = if (filterState == "occupied") {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Ocupadas seleccionadas",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                } else null
+            )
+        }
+
+        // Filtrar las habitaciones según el filtro seleccionado
+        val filteredRooms = when (filterState) {
+            "available" -> roomList.filter { it.patient == null }
+            "occupied" -> roomList.filter { it.patient != null }
+            else -> roomList // "all" o valor por defecto
+        }
+
+        // Grid con las habitaciones filtradas
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(filteredRooms) { room ->
+                RoomCard(room)
+            }
+        }
+    }
+}
+
+@Composable
+fun RoomCard(room: Room) {
+    val isAvailable = room.patient == null
+    val backgroundColor = if (isAvailable) Color(0xFF4CAF50) else MaterialTheme.colorScheme.surface
+    val contentColor = if (isAvailable) Color.White else MaterialTheme.colorScheme.onSurface
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = ("ROOM " + room.name) ?: "",
+                style = MaterialTheme.typography.headlineSmall,
+                color = contentColor
+            )
+
+            Text(
+                text = ("Section " + room.section),
+                style = MaterialTheme.typography.bodyMedium,
+                color = contentColor.copy(alpha = 0.8f)
+            )
+
+            if (!isAvailable) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Outlined.Person,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = contentColor.copy(alpha = 0.6f)
+                    )
+
+                    Spacer(modifier = Modifier.size(4.dp))
+
+                    room.patient?.let {
+                        Text(
+                            text = it.name,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Available",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = contentColor.copy(alpha = 0.9f)
+                )
+            }
+        }
+    }
+}

@@ -2,6 +2,7 @@ package com.example.panacea.data.repositories
 
 import com.example.panacea.data.network.NetworkServicesImpl
 import com.example.panacea.domain.models.nurse.Nurse
+import com.example.panacea.domain.models.room.Room
 import com.example.panacea.domain.repositories.NurseRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,7 +17,6 @@ class NurseRepositoryImpl(
 
     override var nurseList : List<Nurse> = emptyList()
     override var currentNurse: Nurse? = null
-
 
     override fun login(email: String, password: String): Flow<Nurse?> = flow {
         currentNurse = checkNotNull(conn.login(email, password))
