@@ -20,6 +20,6 @@ data class Patient(
     val mobilization: Mobilization?,
     val name: String,
     val password: String,
-    //val room: String?,
+    //val room: String?,aaaaa
     val surname: String
 )
