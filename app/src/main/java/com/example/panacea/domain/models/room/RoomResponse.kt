@@ -1,5 +1,5 @@
 package com.example.panacea.domain.models.room
-
+import com.example.panacea.domain.models.room.Room
 import kotlinx.serialization.Serializable
 
 @Serializable

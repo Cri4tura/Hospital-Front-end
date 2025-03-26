@@ -2,7 +2,6 @@ package com.example.panacea.data.repositories
 
 import com.example.panacea.data.network.NetworkServicesImpl
 import com.example.panacea.domain.models.nurse.Nurse
-import com.example.panacea.domain.models.room.Room
 import com.example.panacea.domain.repositories.NurseRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
