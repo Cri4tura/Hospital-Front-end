@@ -1,4 +1,4 @@
-package com.example.panacea.ui.screens.detail
+package com.example.panacea.ui.screens.detail.nurse
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,10 +24,10 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun DetailView(
+fun NurseDetailView(
     nurseId: Int,
     nav: NavHostController,
-    vm: DetailViewModel = koinViewModel { parametersOf(nurseId) }
+    vm: NurseDetailViewModel = koinViewModel { parametersOf(nurseId) }
 ) {
 
     Box(

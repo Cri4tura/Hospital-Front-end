@@ -18,7 +18,7 @@ object SIGNING
 object DIRECTORY
 
 @Serializable
-data class DETAIL(val nurseId: Int)
+data class NURSE_DETAIL(val nurseId: Int)
 
 @Serializable
 object PROFILE
@@ -33,5 +33,5 @@ object NEWS
 object HISTORY
 
 @Serializable
-object ROOM
+data class ROOM_DETAIL(val roomId: Int)
 

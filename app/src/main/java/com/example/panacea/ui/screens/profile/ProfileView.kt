@@ -10,25 +10,31 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -61,6 +68,7 @@ import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileView(
     nav: NavHostController,
@@ -104,226 +112,238 @@ fun ProfileView(
             nav.navigate(PROFILE)
         }
     }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                windowInsets = WindowInsets.statusBars,
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            nav.navigateUp()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(35.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
+                actions = {
+                    DeleteAccountButton(
+                        onClick = {
+                            vm.data.currentUser?.id?.let {
+                                Toast.makeText(context, "Deleting Account...", Toast.LENGTH_SHORT)
+                                    .show()
+                                vm.deleteAccount(it)
+                            }
+                        },
+                        text = "Delete Account",
+                        enabled = !vm.state.isLoading,
+                    )
+                },
+                title = {},
+//                colors = TopAppBarColors(
+//                    containerColor = Color.Transparent,
+//                    scrolledContainerColor = Color.Transparent,
+//                    navigationIconContentColor = Color.Red,
+//                    titleContentColor = Color.Blue,
+//                    actionIconContentColor = Color.Blue
+//                )
+            )
+        },
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp)
-    ) {
-
-        Box(
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(4.dp)
+                .fillMaxSize()
+                .padding(horizontal = 8.dp)
+                .padding(top= 100.dp)
         ) {
-            if (vm.state.isLoading) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = {
-                    nav.popBackStack()
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier.size(35.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                if (vm.state.isLoading) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier.wrapContentSize()
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(240.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    lerp(
+                                        MaterialTheme.colorScheme.onPrimary,
+                                        MaterialTheme.colorScheme.primary,
+                                        0.35f
+                                    )
+                                )
+                                .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                        ) {
+                            Image(
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,   // Recortar para llenar el círculo
+                                painter = rememberAsyncImagePainter(model = uriToDisplay),
+                                contentDescription = null,
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .zIndex(1f) // Asegura que esté adelante
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    photoPickerLauncher.launch("image/*")
+                                    vm.changeImage()
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = "Change Image",
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        text = "Reset Password",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                            showPasswordResetDialog.value = true
+                        }
+                    )
+
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            DeleteAccountButton(
-                onClick = {
-                    vm.data.currentUser?.id?.let {
-                        Toast.makeText(context, "Deleting Account...", Toast.LENGTH_SHORT).show()
-                        vm.deleteAccount(it)
-                    }
-                },
-                text = "",
-                enabled = !vm.state.isLoading,
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier.wrapContentSize()
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(240.dp)
-                            .clip(CircleShape)
-                            .background(
-                                lerp(
-                                    MaterialTheme.colorScheme.onPrimary,
-                                    MaterialTheme.colorScheme.primary,
-                                    0.35f
-                                )
-                            )
-                            .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                    ) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop,   // Recortar para llenar el círculo
-                            painter = rememberAsyncImagePainter(model = uriToDisplay),
-                            contentDescription = null,
-                        )
-                    }
+                    TextInput(
+                        textInput = name,
+                        onTextChange = { name = it },
+                        label = vm.data.currentUser?.name,
+                        placeholder = null,
+                        isError = null
+                    )
 
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .zIndex(1f) // Asegura que esté adelante
-                    ) {
-                        IconButton(
-                            onClick = {
-                                photoPickerLauncher.launch("image/*")
-                                vm.changeImage()
-                            },
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Edit,
-                                contentDescription = "Change Image",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
+                    TextInput(
+                        textInput = surname,
+                        onTextChange = { surname = it },
+                        label = vm.data.currentUser?.surname,
+                        placeholder = null,
+                        isError = null
+                    )
+
+                    EmailInput(
+                        email = email,
+                        onEmailChange = { email = it },
+                        label = vm.data.currentUser?.email,
+                        placeholder = null,
+                        isError = null
+                    )
+
+                    DateInput(
+                        value = birthDate,
+                        onValueChange = { birthDate = it },
+                        label = vm.data.currentUser?.dateToString(vm.data.currentUser?.birthDate),
+                        placeholder = null,
+                        isError = null
+                    )
                 }
-
-                Spacer(Modifier.height(16.dp))
-
-                Text(
-                    text = "Reset Password",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable {
-                        showPasswordResetDialog.value = true
-                    }
-                )
-
             }
-        }
+            Spacer(modifier = Modifier.weight(1f))
 
-        Spacer(modifier = Modifier.weight(1f))
 
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                contentAlignment = Alignment.BottomCenter
             ) {
-                TextInput(
-                    textInput = name,
-                    onTextChange = { name = it },
-                    label = vm.data.currentUser?.name,
-                    placeholder = null,
-                    isError = null
+                ResetPasswordDialog(
+                    showPasswordResetDialog = showPasswordResetDialog,
+                    newPassword = newPassword,
+                    confirmPassword = confirmPassword,
+                    context = context,
+                    passwordError = passwordError
                 )
 
-                TextInput(
-                    textInput = surname,
-                    onTextChange = { surname = it },
-                    label = vm.data.currentUser?.surname,
-                    placeholder = null,
-                    isError = null
-                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-                EmailInput(
-                    email = email,
-                    onEmailChange = { email = it },
-                    label = vm.data.currentUser?.email,
-                    placeholder = null,
-                    isError = null
-                )
+                PrimaryButton(
+                    onClick = {
 
-                DateInput(
-                    value = birthDate,
-                    onValueChange = { birthDate = it },
-                    label = vm.data.currentUser?.dateToString(vm.data.currentUser?.birthDate),
-                    placeholder = null,
-                    isError = null
-                )
-            }
-        }
-        Spacer(modifier = Modifier.weight(1f))
+                        val dateFormat = SimpleDateFormat(
+                            "dd/MM/yyyy",
+                            Locale.getDefault()
+                        )  // Asegúrate de que el formato coincida con el input
+                        val updatedNurse = vm.data.currentUser?.let {
+                            val parsedBirthDate = try {
+                                if (birthDate.isNotBlank()) dateFormat.parse(birthDate) else it.birthDate
+                            } catch (e: Exception) {
+                                println("Error al convertir la fecha: ${e.message}")
+                                it.birthDate  // Si hay un error, se mantiene la fecha actual
+                            }
 
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            ResetPasswordDialog(
-                showPasswordResetDialog = showPasswordResetDialog,
-                newPassword = newPassword,
-                confirmPassword = confirmPassword,
-                context = context,
-                passwordError = passwordError
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            PrimaryButton(
-                onClick = {
-
-                    val dateFormat = SimpleDateFormat(
-                        "dd/MM/yyyy",
-                        Locale.getDefault()
-                    )  // Asegúrate de que el formato coincida con el input
-                    val updatedNurse = vm.data.currentUser?.let {
-                        val parsedBirthDate = try {
-                            if (birthDate.isNotBlank()) dateFormat.parse(birthDate) else it.birthDate
-                        } catch (e: Exception) {
-                            println("Error al convertir la fecha: ${e.message}")
-                            it.birthDate  // Si hay un error, se mantiene la fecha actual
+                            Nurse(
+                                id = it.id,
+                                name = name.ifBlank { it.name },
+                                surname = surname.ifBlank { it.surname },
+                                email = email.ifBlank { it.email },
+                                password = newPassword.value.ifBlank { it.password },
+                                birthDate = parsedBirthDate!!,
+                                registerDate = it.registerDate
+                            )
                         }
 
-                        Nurse(
-                            id = it.id,
-                            name = name.ifBlank { it.name },
-                            surname = surname.ifBlank { it.surname },
-                            email = email.ifBlank { it.email },
-                            password = newPassword.value.ifBlank { it.password },
-                            birthDate = parsedBirthDate!!,
-                            registerDate = it.registerDate
-                        )
-                    }
-
-                    println(updatedNurse)
-                    if (updatedNurse != null) {
-                        vm.updateNurse(updatedNurse)
-                    }
-                },
-                icon = Icons.Outlined.Create,
-                text = "Save",
-                enabled = !vm.state.isLoading,
-                description = "Save changes"
-            )
+                        println(updatedNurse)
+                        if (updatedNurse != null) {
+                            vm.updateNurse(updatedNurse)
+                        }
+                    },
+                    icon = Icons.Outlined.Create,
+                    text = "Save",
+                    enabled = !vm.state.isLoading,
+                    description = "Save changes"
+                )
+            }
         }
     }
 }

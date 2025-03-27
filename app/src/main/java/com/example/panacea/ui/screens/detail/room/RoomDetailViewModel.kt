@@ -1,17 +1,17 @@
-package com.example.panacea.ui.screens.detail
+package com.example.panacea.ui.screens.detail.room
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.panacea.domain.models.nurse.Nurse
-import com.example.panacea.data.repositories.NurseRepositoryImpl
+import com.example.panacea.data.repositories.RoomRepositoryImpl
+import com.example.panacea.domain.models.room.Room
 import kotlinx.coroutines.launch
 
-class DetailViewModel(
-    private val nurseId: Int,
-    private val repository: NurseRepositoryImpl
+class RoomDetailViewModel(
+    private val roomId: Int,
+    private val repository: RoomRepositoryImpl
 ) : ViewModel() {
 
     var state by mutableStateOf(UiState())
@@ -23,9 +23,9 @@ class DetailViewModel(
     init {
         viewModelScope.launch {
             state = UiState(isLoading = true)
-            val nurseList = repository.getCachedNurseList()
-            val nurseToShow = nurseList.find { it.id == nurseId }
-            data = UiData(nurse = nurseToShow)
+            val roomList = repository.getCachedRoomList()
+            val roomToShow = roomList.find { it.id == roomId }
+            data = UiData(room = roomToShow)
             state = UiState(isLoading = false)
         }
     }
@@ -35,6 +35,6 @@ class DetailViewModel(
     )
 
     data class UiData(
-        val nurse: Nurse? = null,
+        val room: Room? = null,
     )
 }

@@ -11,14 +11,15 @@ import com.example.panacea.ui.screens.login.LoginView
 import com.example.panacea.ui.screens.login.LoginViewModel
 import com.example.panacea.ui.screens.directory.DirectoryView
 import com.example.panacea.ui.screens.directory.DirectoryViewModel
-import com.example.panacea.ui.screens.detail.DetailView
-import com.example.panacea.ui.screens.detail.DetailViewModel
+import com.example.panacea.ui.screens.detail.nurse.NurseDetailView
+import com.example.panacea.ui.screens.detail.nurse.NurseDetailViewModel
+import com.example.panacea.ui.screens.detail.room.RoomDetailView
+import com.example.panacea.ui.screens.detail.room.RoomDetailViewModel
 import com.example.panacea.ui.screens.documents.DocsView
 import com.example.panacea.ui.screens.history.HistoryView
 import com.example.panacea.ui.screens.news.NewsView
 import com.example.panacea.ui.screens.profile.ProfileView
 import com.example.panacea.ui.screens.profile.ProfileViewModel
-import com.example.panacea.ui.screens.room.RoomView
 import com.example.panacea.ui.screens.signIn.SignInView
 import com.example.panacea.ui.screens.splash.SplashView
 import com.example.panacea.ui.screens.signIn.SignInViewModel
@@ -63,12 +64,12 @@ fun Navigation(
                 vm = DirectoryViewModel(koinInject())
             )
         }
-        composable<DETAIL> { backStackEntry ->
-            val detail = backStackEntry.toRoute<DETAIL>()
-            DetailView(
+        composable<NURSE_DETAIL> { backStackEntry ->
+            val detail = backStackEntry.toRoute<NURSE_DETAIL>()
+            NurseDetailView(
                 nurseId = detail.nurseId,
                 nav = nav,
-                vm = DetailViewModel(
+                vm = NurseDetailViewModel(
                     repository = koinInject(),
                     nurseId = detail.nurseId
                 )
@@ -89,8 +90,16 @@ fun Navigation(
         composable<HISTORY> {
             HistoryView(nav = nav)
         }
-        composable<ROOM> {
-            RoomView(nav = nav)
+        composable<ROOM_DETAIL> { backStackEntry ->
+            val detail = backStackEntry.toRoute<ROOM_DETAIL>()
+            RoomDetailView(
+                roomId = detail.roomId,
+                nav = nav,
+                vm = RoomDetailViewModel(
+                    repository = koinInject(),
+                    roomId = detail.roomId
+                )
+            )
         }
     }
 }

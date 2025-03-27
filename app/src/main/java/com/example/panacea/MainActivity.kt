@@ -18,22 +18,26 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.panacea.ui.navigation.Navigation
 import com.example.panacea.ui.theme.HospitalFrontendTheme
+import org.koin.androidx.compose.KoinAndroidContext
+import org.koin.core.annotation.KoinExperimentalAPI
 
 class MainActivity : AppCompatActivity() {
 
+    @OptIn(KoinExperimentalAPI::class)
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            EnableAutoHideSystemBars()
+//            EnableAutoHideSystemBars()
             HospitalFrontendTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    println("INICIANDO NAVEGACION..........................!")
-                    Navigation(nav = rememberNavController())
+                    KoinAndroidContext {
+                        Navigation(nav = rememberNavController())
+                    }
                 }
             }
         }

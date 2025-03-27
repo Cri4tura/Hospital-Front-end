@@ -111,7 +111,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.panacea.R
 import com.example.panacea.data.utils.Constants.MENU
 import com.example.panacea.domain.models.nurse.Nurse
-import com.example.panacea.ui.navigation.DETAIL
+import com.example.panacea.ui.navigation.NURSE_DETAIL
 import com.example.panacea.ui.navigation.DIRECTORY
 import com.example.panacea.ui.navigation.DOCUMENTS
 import com.example.panacea.ui.navigation.HISTORY
@@ -123,6 +123,9 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -146,6 +149,7 @@ fun DrawerAppBar(
             Column(
                 modifier = Modifier
                     .background(color = MaterialTheme.colorScheme.background)
+                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
                     .padding(horizontal = 16.dp, vertical = 16.dp)
                     .fillMaxWidth(0.75f)
                     .fillMaxHeight()
@@ -156,6 +160,12 @@ fun DrawerAppBar(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
+                    Image(
+                        painter = painterResource(id = R.drawable.panacea),
+                        contentDescription = null,
+                    )
+
                     Spacer(Modifier.height(16.dp))
 
                     Box(
@@ -774,11 +784,18 @@ fun DeleteAccountButton(
             contentColor = Color.Black
         )
     ) {
-        Icon(
-            imageVector = Icons.Outlined.Delete,
-            contentDescription = "Log Out",
-            modifier = Modifier.size(ButtonDefaults.IconSize)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ){
+            Text(text)
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Icon(
+                imageVector = Icons.Outlined.Delete,
+                contentDescription = "Log Out",
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+        }
+
     }
 }
 
@@ -825,7 +842,7 @@ fun NurseItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                nav.navigate(DETAIL(nurse.id))
+                nav.navigate(NURSE_DETAIL(nurse.id))
             }
     ) {
 

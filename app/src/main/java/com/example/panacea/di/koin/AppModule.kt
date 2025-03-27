@@ -62,7 +62,7 @@ val appModule = module {
             install(DefaultRequest) {
                 url {
                     protocol = URLProtocol.HTTP
-                    host = "192.168.145.1"
+                    host = "10.118.5.40"
                     port = 8080
                 }
             }
